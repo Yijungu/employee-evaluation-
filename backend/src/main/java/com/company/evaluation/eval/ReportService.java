@@ -1,5 +1,7 @@
 package com.company.evaluation.eval;
 
+import com.company.evaluation.employee.Employee;
+import com.company.evaluation.employee.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
