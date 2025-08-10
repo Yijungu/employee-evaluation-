@@ -1,7 +1,10 @@
-package com.company.evaluation.eval;
+package com.company.evaluation.report;
 
 import com.company.evaluation.employee.Employee;
 import com.company.evaluation.employee.EmployeeRepository;
+import com.company.evaluation.eval.EvaluationRepository;
+import com.company.evaluation.eval.SalaryRaise;
+import com.company.evaluation.eval.SalaryRaiseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -63,5 +66,6 @@ public class ReportService {
         return new ReportResponse(working, retired, avgRaise, totalBase, totalRaised, rows);
     }
 }
+
 
 

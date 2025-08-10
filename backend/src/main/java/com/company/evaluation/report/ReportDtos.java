@@ -1,4 +1,4 @@
-package com.company.evaluation.eval;
+package com.company.evaluation.report;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,5 +28,6 @@ class ReportResponse {
     private long totalRaisedPayroll;
     private List<ReportEmployeeDto> employees;
 }
+
 
 

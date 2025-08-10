@@ -1,4 +1,4 @@
-package com.company.evaluation.eval;
+package com.company.evaluation.report;
 
 import com.company.evaluation.common.ApiResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,5 +21,6 @@ public class ReportController {
         return ApiResponse.ok(reportService.buildReport());
     }
 }
+
 
 
