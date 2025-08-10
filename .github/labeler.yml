@@ -1,24 +1,27 @@
-labels:
-  - label: backend
-    changed-files:
+backend:
+  - changed-files:
       - any-glob-to-any-file:
           - "backend/**"
-  - label: frontend
-    changed-files:
+
+frontend:
+  - changed-files:
       - any-glob-to-any-file:
           - "frontend/**"
-  - label: refactor
-    changed-files:
+
+refactor:
+  - changed-files:
       - any-glob-to-any-file:
           - "backend/src/main/java/com/company/evaluation/**/service/**"
           - "backend/src/main/java/com/company/evaluation/**/controller/**"
           - "frontend/src/**"
-  - label: ci
-    changed-files:
+
+ci:
+  - changed-files:
       - any-glob-to-any-file:
           - ".github/workflows/**"
-  - label: config
-    changed-files:
+
+config:
+  - changed-files:
       - any-glob-to-any-file:
           - "backend/src/main/resources/**"
           - "frontend/**/vite.config.*"
