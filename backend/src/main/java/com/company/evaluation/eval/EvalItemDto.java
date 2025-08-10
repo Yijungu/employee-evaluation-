@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.company.evaluation.eval.domain.EvalItem;
 
 @Data
 @NoArgsConstructor

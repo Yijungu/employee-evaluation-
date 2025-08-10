@@ -1,7 +1,7 @@
 package com.company.evaluation.eval.mapper;
 
-import com.company.evaluation.eval.EvalItem;
-import com.company.evaluation.eval.EvalCategory;
+import com.company.evaluation.eval.domain.EvalItem;
+import com.company.evaluation.eval.domain.EvalCategory;
 import com.company.evaluation.eval.dto.EvalItemRequest;
 import com.company.evaluation.eval.dto.EvalItemResponse;
 import org.mapstruct.*;

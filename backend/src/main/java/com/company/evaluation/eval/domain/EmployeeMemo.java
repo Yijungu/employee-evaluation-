@@ -1,4 +1,4 @@
-package com.company.evaluation.eval;
+package com.company.evaluation.eval.domain;
 
 import com.company.evaluation.employee.Employee;
 import jakarta.persistence.*;

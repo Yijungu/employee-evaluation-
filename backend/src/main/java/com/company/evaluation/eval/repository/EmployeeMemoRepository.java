@@ -1,5 +1,6 @@
-package com.company.evaluation.eval;
+package com.company.evaluation.eval.repository;
 
+import com.company.evaluation.eval.domain.EmployeeMemo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
