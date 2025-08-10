@@ -1,13 +1,24 @@
 backend:
-  - backend/**
+  - changed-files:
+      - any-glob-to-any-file: ["backend/**"]
+
 frontend:
-  - frontend/**
+  - changed-files:
+      - any-glob-to-any-file: ["frontend/**"]
+
 refactor:
-  - backend/src/main/java/com/company/evaluation/**/service/**
-  - backend/src/main/java/com/company/evaluation/**/controller/**
-  - frontend/src/**
+  - changed-files:
+      - any-glob-to-any-file:
+          [
+            "backend/src/main/java/com/company/evaluation/**/service/**",
+            "backend/src/main/java/com/company/evaluation/**/controller/**",
+            "frontend/src/**"
+          ]
+
 ci:
-  - .github/workflows/**
+  - changed-files:
+      - any-glob-to-any-file: [".github/workflows/**"]
+
 config:
-  - backend/src/main/resources/**
-  - frontend/**/vite.config.*
+  - changed-files:
+      - any-glob-to-any-file: ["backend/src/main/resources/**", "frontend/**/vite.config.*"]
