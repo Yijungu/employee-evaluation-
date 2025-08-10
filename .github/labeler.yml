@@ -1,0 +1,13 @@
+backend:
+  - backend/**
+frontend:
+  - frontend/**
+refactor:
+  - backend/src/main/java/com/company/evaluation/**/service/**
+  - backend/src/main/java/com/company/evaluation/**/controller/**
+  - frontend/src/**
+ci:
+  - .github/workflows/**
+config:
+  - backend/src/main/resources/**
+  - frontend/**/vite.config.*
