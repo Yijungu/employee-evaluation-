@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-const Employees = () => import('../views/Employees.vue')
-const EvalItems = () => import('../views/EvalItems.vue')
-const Evaluation = () => import('../views/Evaluation.vue')
-const Report = () => import('../views/Report.vue')
+const Employees = () => import('../modules/employees/pages/EmployeesPage.vue')
+const EvalItems = () => import('../modules/eval-items/pages/EvalItemsPage.vue')
+const Evaluation = () => import('../modules/evaluation/pages/EvaluationPage.vue')
+const Report = () => import('../modules/report/pages/ReportPage.vue')
 
 const router = createRouter({
   history: createWebHistory(),

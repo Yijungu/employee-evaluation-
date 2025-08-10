@@ -12,7 +12,9 @@
         <RouterLink class="nav-link" to="/report">평가 보고서</RouterLink>
       </div>
     </nav>
-    <router-view />
+    <main class="container py-3">
+      <router-view />
+    </main>
   </div>
   
 </template>

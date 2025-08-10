@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { searchEmployees, getEvalItems, saveEvaluations, saveMemo, saveRaise, getEvaluations, getRaise } from '../services/api'
+import { ref, onMounted } from 'vue'
+import { searchEmployees, getEvalItems, saveEvaluations, saveMemo, saveRaise, getEvaluations, getRaise } from '../../../services/api'
 
 const employees = ref([])
 const items = ref([])
@@ -70,7 +70,6 @@ const load = async () => {
   ])
   employees.value = empRes.data.data.content ?? []
   items.value = itemRes.data.data ?? []
-  // init state rows with one empty row per employee
   // 직원별 기존 저장 점수 불러오기 + 기본 행 1개 보장
   for (const e of employees.value) {
     addRow(e.id)
@@ -169,5 +168,6 @@ onMounted(load)
     </div>
   </div>
 </template>
+
 
 

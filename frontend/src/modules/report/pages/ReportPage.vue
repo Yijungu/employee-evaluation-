@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import Chart from 'chart.js/auto'
-import api from '../services/api'
+import api from '../../../services/api'
 
 const data = ref(null)
 
@@ -93,7 +93,6 @@ const drawCharts = () => {
 const load = async () => {
   const res = await api.get('/report')
   data.value = res.data.data
-  // 다음 틱에 캔버스가 렌더링된 이후 차트 생성
   requestAnimationFrame(() => drawCharts())
 }
 
@@ -171,5 +170,6 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
+
 
 

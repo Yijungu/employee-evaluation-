@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import api from '../services/api'
+import api from '../../../services/api'
 
 // 검색 영역
 const keyword = ref('')
@@ -152,5 +152,6 @@ onMounted(load)
     </div>
   </div>
 </template>
+
 
 
