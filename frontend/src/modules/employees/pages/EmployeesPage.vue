@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { searchEmployees, saveEmployee, uploadEmployeesExcel } from '../services/api'
+import { searchEmployees, saveEmployee, uploadEmployeesExcel } from '../../../services/api'
 
 const filters = ref({ name: '', status: '', region: '' })
 const employees = ref([])
@@ -185,5 +185,6 @@ onMounted(load)
 <style scoped>
 .container { max-width: 1100px; }
 </style>
+
 
 
