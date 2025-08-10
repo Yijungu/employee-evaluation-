@@ -2,6 +2,12 @@ package com.company.evaluation.eval;
 
 import com.company.evaluation.employee.Employee;
 import com.company.evaluation.employee.EmployeeRepository;
+import com.company.evaluation.eval.dto.EvalItemRequest;
+import com.company.evaluation.eval.dto.EvalItemResponse;
+import com.company.evaluation.eval.dto.EvaluationRowResponse;
+import com.company.evaluation.eval.dto.SalaryRaiseRequest;
+import com.company.evaluation.eval.dto.SalaryRaiseResponse;
+import com.company.evaluation.eval.mapper.EvalItemMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,16 +22,19 @@ public class EvalService {
     private final EmployeeMemoRepository memoRepo;
     private final SalaryRaiseRepository raiseRepo;
     private final EmployeeRepository employeeRepo;
+    private final EvalItemMapper itemMapper;
 
     public EvalService(EvalCategoryRepository categoryRepo, EvalItemRepository itemRepo,
                        EvaluationRepository evaluationRepo, EmployeeMemoRepository memoRepo,
-                       SalaryRaiseRepository raiseRepo, EmployeeRepository employeeRepo) {
+                       SalaryRaiseRepository raiseRepo, EmployeeRepository employeeRepo,
+                       EvalItemMapper itemMapper) {
         this.categoryRepo = categoryRepo;
         this.itemRepo = itemRepo;
         this.evaluationRepo = evaluationRepo;
         this.memoRepo = memoRepo;
         this.raiseRepo = raiseRepo;
         this.employeeRepo = employeeRepo;
+        this.itemMapper = itemMapper;
     }
 
     // Categories
@@ -33,24 +42,15 @@ public class EvalService {
     public EvalCategory createCategory(EvalCategory c) { return categoryRepo.save(c); }
 
     // Items
-    public List<EvalItemDto> listItems() { return itemRepo.findAll().stream().map(EvalItemDto::from).toList(); }
-    public EvalItemDto createItem(EvalItemDto i) {
-        EvalItem entity = new EvalItem();
-        entity.setName(i.getName());
-        entity.setMaxScore(i.getMaxScore());
-        entity.setEnabled(Boolean.TRUE.equals(i.getEnabled()));
-        entity.setDescription(i.getDescription());
-        if (i.getCategoryId() != null) entity.setCategory(categoryRepo.findById(i.getCategoryId()).orElse(null));
-        return EvalItemDto.from(itemRepo.save(entity));
+    public List<EvalItemResponse> listItems() { return itemRepo.findAll().stream().map(itemMapper::toResponse).toList(); }
+    public EvalItemResponse createItem(EvalItemRequest i) {
+        EvalItem entity = itemMapper.toEntity(i);
+        return itemMapper.toResponse(itemRepo.save(entity));
     }
-    public EvalItemDto updateItem(Long id, EvalItemDto i) {
+    public EvalItemResponse updateItem(Long id, EvalItemRequest i) {
         EvalItem exist = itemRepo.findById(id).orElseThrow();
-        exist.setName(i.getName());
-        exist.setMaxScore(i.getMaxScore());
-        exist.setEnabled(Boolean.TRUE.equals(i.getEnabled()));
-        exist.setDescription(i.getDescription());
-        if (i.getCategoryId() != null) exist.setCategory(categoryRepo.findById(i.getCategoryId()).orElse(null));
-        return EvalItemDto.from(itemRepo.save(exist));
+        itemMapper.updateEntity(exist, i);
+        return itemMapper.toResponse(itemRepo.save(exist));
     }
 
     // Evaluations
@@ -74,8 +74,13 @@ public class EvalService {
         return evaluationRepo.findByEmployeeId(employeeId);
     }
 
-    public List<EvalItemScoreDto> getEvaluations(Long employeeId) {
-        return evaluationRepo.findByEmployeeId(employeeId).stream().map(EvalItemScoreDto::from).toList();
+    public List<EvaluationRowResponse> getEvaluations(Long employeeId) {
+        return evaluationRepo.findByEmployeeId(employeeId).stream()
+                .map(e -> new EvaluationRowResponse(
+                        e.getItem() != null ? e.getItem().getId() : null,
+                        e.getItem() != null ? e.getItem().getName() : null,
+                        e.getScore()
+                )).toList();
     }
 
     public EmployeeMemo saveMemo(Long employeeId, EmployeeMemo memo) {
@@ -83,13 +88,27 @@ public class EvalService {
         return memoRepo.save(memo);
     }
 
-    public SalaryRaise saveRaise(Long employeeId, SalaryRaise raise) {
+    public SalaryRaiseResponse saveRaise(Long employeeId, SalaryRaiseRequest req) {
+        SalaryRaise raise = new SalaryRaise();
         raise.setEmployee(employeeRepo.findById(employeeId).orElseThrow());
-        return raiseRepo.save(raise);
+        raise.setRaisePercent(req.getRaisePercent());
+        raise.setRaisedSalary(req.getRaisedSalary());
+        SalaryRaise saved = raiseRepo.save(raise);
+        SalaryRaiseResponse res = new SalaryRaiseResponse();
+        res.setRaisePercent(saved.getRaisePercent());
+        res.setRaisedSalary(saved.getRaisedSalary());
+        return res;
     }
 
-    public SalaryRaiseDto getRaise(Long employeeId) {
-        return raiseRepo.findTopByEmployeeIdOrderByIdDesc(employeeId).map(SalaryRaiseDto::from).orElse(null);
+    public SalaryRaiseResponse getRaise(Long employeeId) {
+        return raiseRepo.findTopByEmployeeIdOrderByIdDesc(employeeId)
+                .map(s -> {
+                    SalaryRaiseResponse r = new SalaryRaiseResponse();
+                    r.setRaisePercent(s.getRaisePercent());
+                    r.setRaisedSalary(s.getRaisedSalary());
+                    return r;
+                })
+                .orElse(null);
     }
 }
 
