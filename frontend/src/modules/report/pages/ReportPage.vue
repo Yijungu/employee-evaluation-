@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import Chart from 'chart.js/auto'
-import api from '../../../services/api'
+import { getReport } from '../services/report.service'
 
 const data = ref(null)
 
@@ -91,7 +91,7 @@ const drawCharts = () => {
 }
 
 const load = async () => {
-  const res = await api.get('/report')
+  const res = await getReport()
   data.value = res.data.data
   requestAnimationFrame(() => drawCharts())
 }

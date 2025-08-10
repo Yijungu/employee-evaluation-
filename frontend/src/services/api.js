@@ -4,24 +4,20 @@ const api = axios.create({
   baseURL: '/api',
 })
 
+// 공통 인터셉터: 에러 로깅 및 사용자 메시지 처리 기반
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    // 간단한 에러 메시지 노출
+    const msg = err?.response?.data?.message || err.message || '요청 처리 중 오류가 발생했습니다.'
+    if (typeof window !== 'undefined') {
+      // eslint-disable-next-line no-alert
+      alert(msg)
+    }
+    return Promise.reject(err)
+  }
+)
+
 export default api
-
-// Employee APIs
-export const searchEmployees = (params) => api.get('/employees', { params })
-export const saveEmployee = (payload) => api.post('/employees', payload)
-export const uploadEmployeesExcel = (file) => {
-  const form = new FormData()
-  form.append('file', file)
-  return api.post('/employees/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } })
-}
-
-// Eval APIs
-export const getEvalCategories = () => api.get('/categories')
-export const getEvalItems = () => api.get('/items')
-export const saveEvaluations = (employeeId, list) => api.post(`/employees/${employeeId}/evaluations`, list)
-export const saveMemo = (employeeId, memo) => api.post(`/employees/${employeeId}/memos`, memo)
-export const saveRaise = (employeeId, raise) => api.post(`/employees/${employeeId}/raise`, raise)
-export const getEvaluations = (employeeId) => api.get(`/employees/${employeeId}/evaluations`)
-export const getRaise = (employeeId) => api.get(`/employees/${employeeId}/raise`)
 
 

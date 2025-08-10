@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { searchEmployees, getEvalItems, saveEvaluations, saveMemo, saveRaise, getEvaluations, getRaise } from '../../../services/api'
+import { searchEmployees } from '../../employees/services/employees.service'
+import { getEvalItems, saveEvaluations, saveMemo, saveRaise, getEvaluations, getRaise } from '../services/evaluation.service'
 
 const employees = ref([])
 const items = ref([])

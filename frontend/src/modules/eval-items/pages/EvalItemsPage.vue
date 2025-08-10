@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import api from '../../../services/api'
+import { getEvalCategories, getEvalItems, createEvalItem, updateEvalItem, createCategory } from '../services/eval-items.service'
 
 // 검색 영역
 const keyword = ref('')
@@ -24,8 +24,8 @@ const newCategoryName = ref('')
 
 const load = async () => {
   const [catRes, itemRes] = await Promise.all([
-    api.get('/categories'),
-    api.get('/items')
+    getEvalCategories(),
+    getEvalItems(),
   ])
   categories.value = catRes.data.data || []
   const list = itemRes.data.data || []
@@ -41,14 +41,14 @@ const saveItem = async () => {
     description: form.value.description,
     categoryId: form.value.categoryId ? Number(form.value.categoryId) : null,
   }
-  if (form.value.id) await api.put(`/items/${form.value.id}`, payload)
-  else await api.post('/items', payload)
+  if (form.value.id) await updateEvalItem(form.value.id, payload)
+  else await createEvalItem(payload)
   await load(); showForm.value = false; alert('저장 완료')
 }
 
 const addCategory = async () => {
   if (!newCategoryName.value) return
-  await api.post('/categories', { name: newCategoryName.value })
+  await createCategory(newCategoryName.value)
   newCategoryName.value = ''
   await load()
 }
