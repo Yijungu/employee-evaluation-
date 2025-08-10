@@ -1,6 +1,8 @@
 package com.company.evaluation.employee;
 
 import com.company.evaluation.common.ApiResponse;
+import com.company.evaluation.employee.dto.EmployeeRequest;
+import com.company.evaluation.employee.dto.EmployeeResponse;
 import jakarta.validation.Valid;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -25,7 +27,7 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ApiResponse<Page<Employee>> search(@RequestParam(name = "name", required = false) String name,
+    public ApiResponse<Page<EmployeeResponse>> search(@RequestParam(name = "name", required = false) String name,
                                               @RequestParam(name = "status", required = false) String status,
                                               @RequestParam(name = "region", required = false) String region,
                                               @RequestParam(name = "page", defaultValue = "0") int page,
@@ -34,7 +36,7 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ApiResponse<Employee> save(@Valid @RequestBody EmployeeDto dto) {
+    public ApiResponse<EmployeeResponse> save(@Valid @RequestBody EmployeeRequest dto) {
         return ApiResponse.ok(service.save(dto));
     }
 
@@ -45,12 +47,12 @@ public class EmployeeController {
         int saved = 0;
         try (InputStream is = file.getInputStream(); Workbook wb = new XSSFWorkbook(is)) {
             Sheet sheet = wb.getSheetAt(0);
-            List<EmployeeDto> rows = new ArrayList<>();
+            List<EmployeeRequest> rows = new ArrayList<>();
             boolean header = true;
             for (Row row : sheet) {
                 if (header) { header = false; continue; }
                 if (row == null) continue;
-                EmployeeDto dto = new EmployeeDto();
+                EmployeeRequest dto = new EmployeeRequest();
                 dto.setEmployeeNumber(getString(row, 0));
                 dto.setName(getString(row, 1));
                 dto.setJoinYear(getInt(row, 2));
@@ -65,7 +67,7 @@ public class EmployeeController {
                     rows.add(dto);
                 }
             }
-            for (EmployeeDto dto : rows) {
+            for (EmployeeRequest dto : rows) {
                 service.save(dto);
                 saved++;
             }
