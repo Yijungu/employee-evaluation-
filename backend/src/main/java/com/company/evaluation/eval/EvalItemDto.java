@@ -1,5 +1,6 @@
 package com.company.evaluation.eval;
 
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EvalItemDto {
     private Long id;
+    @NotBlank
     private String name;
+    @NotNull @Min(0)
     private Integer maxScore;
+    @NotNull
     private Boolean enabled;
     private String description;
     private Long categoryId;

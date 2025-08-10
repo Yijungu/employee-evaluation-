@@ -1,28 +1,7 @@
 spring:
-  datasource:
-    url: jdbc:h2:file:~/employee_eval/db;DB_CLOSE_DELAY=-1
-    username: sa
-    password: 
-    driver-class-name: org.h2.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
-    open-in-view: true
-  flyway:
-    enabled: false
-    locations: classpath:db/migration
+  profiles:
+    active: dev
 
-server:
-  port: 8080
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    com.company.evaluation: debug
 
 
 
