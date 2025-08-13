@@ -1,94 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { searchEmployees } from '../../employees/services/employees.service'
-import { getEvalItems, saveEvaluations, saveMemo, saveRaise, getEvaluations, getRaise } from '../services/evaluation.service'
 import EvaluationRows from '../components/EvaluationRows.vue'
 import { toast } from '../../../services/toast'
+import { useEvaluationStore } from '../store/useEvaluationStore'
 
-const employees = ref([])
-const items = ref([])
-
-// per-employee state
-const rowsByEmp = ref({})          // { empId: [{ id: uniqueKey, itemId: null, score: 0 }] }
-const raisePctByEmp = ref({})      // { empId: number }
-const memoByEmp = ref({})          // { empId: { projectName, period, detail } }
-
-const ensureEmpState = (empId) => {
-  if (!rowsByEmp.value[empId]) rowsByEmp.value[empId] = []
-  if (raisePctByEmp.value[empId] == null) raisePctByEmp.value[empId] = 0
-  if (!memoByEmp.value[empId]) memoByEmp.value[empId] = { projectName: '', period: '', detail: '' }
-}
-
-const addRow = (empId) => {
-  ensureEmpState(empId)
-  rowsByEmp.value[empId].push({ id: Date.now()+Math.random(), itemId: null, score: 0 })
-}
-const removeRow = (empId, idx) => {
-  rowsByEmp.value[empId].splice(idx, 1)
-}
-
-const totalScore = (empId) => rowsByEmp.value[empId]?.reduce((sum, r) => sum + (Number(r.score)||0), 0) || 0
-const raisedSalary = (emp) => Math.round((emp.baseSalary||0) * (1 + (Number(raisePctByEmp.value[emp.id])||0)/100))
+const store = useEvaluationStore()
+const employees = store.employees
+const items = store.items
+const rowsByEmp = store.rowsByEmp
+const raisePctByEmp = store.raisePctByEmp
+const memoByEmp = store.memoByEmp
+const addRow = (empId) => store.addRow(empId)
+const removeRow = (empId, idx) => store.removeRow(empId, idx)
+const totalScore = (empId) => store.totalScore(empId)
+const raisedSalary = (emp) => store.raisedSalary(emp)
 
 const openMemoEmpId = ref(null)
 const openMemo = (empId) => { ensureEmpState(empId); openMemoEmpId.value = empId; new bootstrap.Modal(document.getElementById('memoModal')).show() }
-const saveMemoModal = async () => {
-  const empId = openMemoEmpId.value
-  if (!empId) return
-  const memo = memoByEmp.value[empId]
-  if (memo.projectName || memo.period || memo.detail) await saveMemo(empId, memo)
-  bootstrap.Modal.getInstance(document.getElementById('memoModal')).hide()
-}
+const saveMemoModal = async () => { const empId = openMemoEmpId.value; await store.saveMemoModal(empId); bootstrap.Modal.getInstance(document.getElementById('memoModal')).hide() }
 
 const saveRow = async (emp) => {
-  ensureEmpState(emp.id)
-  // 유효성: 항목 미선택/중복 금지
-  const chosen = rowsByEmp.value[emp.id].filter(r => r.itemId != null)
-  if (!chosen.length) return alert('평가 항목을 선택해 주세요.')
-  const seen = new Set()
-  for (const r of chosen) {
-    const id = Number(r.itemId)
-    if (seen.has(id)) return alert('같은 평가 항목을 중복 선택할 수 없습니다.')
-    seen.add(id)
-  }
-  const list = chosen
-    .filter(r => r.score !== null && r.score !== undefined)
-    .map(r => ({ item: { id: Number(r.itemId) }, score: Number(r.score) }))
-  if (list.length) await saveEvaluations(emp.id, list)
-  const pct = Number(raisePctByEmp.value[emp.id])||0
-  if (pct) await saveRaise(emp.id, { raisePercent: pct, raisedSalary: raisedSalary(emp) })
-  // 저장 후 서버에서 다시 불러와서 화면에 고정
-  try {
-    const res = await getEvaluations(emp.id)
-    const saved = res.data.data || []
-    rowsByEmp.value[emp.id] = saved.map(s => ({ id: Date.now()+Math.random(), itemId: s.itemId, score: s.score }))
-  } catch {}
-  toast('저장 완료', 'success')
+  try { await store.saveRow(emp); toast('저장 완료', 'success') } catch (e) { toast(e.message || '저장 실패', 'danger') }
 }
 
-const load = async () => {
-  const [empRes, itemRes] = await Promise.all([
-    searchEmployees({}),
-    getEvalItems(),
-  ])
-  employees.value = empRes.data.data.content ?? []
-  items.value = itemRes.data.data ?? []
-  // 직원별 기존 저장 점수 불러오기 + 기본 행 1개 보장
-  for (const e of employees.value) {
-    addRow(e.id)
-    try {
-      const res = await getEvaluations(e.id)
-      const saved = res.data.data || []
-      if (saved.length) {
-        rowsByEmp.value[e.id] = saved.map(s => ({ id: Date.now()+Math.random(), itemId: s.itemId, score: s.score }))
-      }
-      const r = await getRaise(e.id)
-      if (r.data.data) {
-        raisePctByEmp.value[e.id] = r.data.data.raisePercent || 0
-      }
-    } catch {}
-  }
-}
+const load = async () => { await store.load() }
 
 onMounted(load)
 </script>

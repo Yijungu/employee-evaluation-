@@ -1,59 +1,26 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { getEvalCategories, getEvalItems, createEvalItem, updateEvalItem, createCategory } from '../services/eval-items.service'
+import { onMounted } from 'vue'
 import EvalItemForm from '../components/EvalItemForm.vue'
 import { toast } from '../../../services/toast'
+import { useEvalItemsStore } from '../store/useEvalItemsStore'
 
-// 검색 영역
-const keyword = ref('')
-const categoryFilter = ref('')
-const categories = ref([])
-const items = ref([]) // API 목록 (DTO)
+const store = useEvalItemsStore()
+const keyword = store.$state.keyword
+const categoryFilter = store.$state.categoryFilter
+const categories = store.$state.categories
+const items = store.$state.items
+const filtered = store.filtered
+const showForm = store.$state.showForm
+const form = store.$state.form
+const startCreate = store.startCreate
+const startEdit = store.startEdit
+const newCategoryName = store.$state.newCategoryName
 
-const filtered = computed(() => items.value.filter(it => {
-  const byKw = !keyword.value || it.name.includes(keyword.value)
-  const byCat = !categoryFilter.value || String(it.categoryId) === String(categoryFilter.value)
-  return byKw && byCat
-}))
+const load = async () => { await store.load() }
 
-// 등록/수정 폼 상태
-const showForm = ref(false)
-const form = ref({ id: null, name: '', categoryId: '', maxScore: 10, enabled: true, description: '' })
-const startCreate = () => { showForm.value = true; form.value = { id: null, name: '', categoryId: '', maxScore: 10, enabled: true, description: '' } }
-const startEdit = (row) => { showForm.value = true; form.value = { id: row.id, name: row.name, categoryId: row.categoryId || '', maxScore: row.maxScore, enabled: !!row.enabled, description: row.description || '' } }
+const saveItem = async () => { await store.saveItem(); toast('저장 완료', 'success') }
 
-const newCategoryName = ref('')
-
-const load = async () => {
-  const [catRes, itemRes] = await Promise.all([
-    getEvalCategories(),
-    getEvalItems(),
-  ])
-  categories.value = catRes.data.data || []
-  const list = itemRes.data.data || []
-  // 중복 방지 (id 기준)
-  items.value = Array.from(new Map(list.map(i => [i.id, i])).values())
-}
-
-const saveItem = async () => {
-  const payload = {
-    name: form.value.name,
-    maxScore: Number(form.value.maxScore),
-    enabled: !!form.value.enabled,
-    description: form.value.description,
-    categoryId: form.value.categoryId ? Number(form.value.categoryId) : null,
-  }
-  if (form.value.id) await updateEvalItem(form.value.id, payload)
-  else await createEvalItem(payload)
-  await load(); showForm.value = false; toast('저장 완료', 'success')
-}
-
-const addCategory = async () => {
-  if (!newCategoryName.value) return
-  await createCategory(newCategoryName.value)
-  newCategoryName.value = ''
-  await load()
-}
+const addCategory = async () => { await store.addCategory(); toast('카테고리 추가 완료', 'success') }
 
 onMounted(load)
 </script>
