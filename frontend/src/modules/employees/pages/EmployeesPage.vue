@@ -3,8 +3,10 @@ import { ref, onMounted } from 'vue'
 import EmployeeFormModal from '../components/EmployeeFormModal.vue'
 import { useEmployeesStore } from '../store/useEmployeesStore'
 import { toast } from '../../../services/toast'
+import { useValidation } from '../../../composables/useValidation'
 
 const store = useEmployeesStore()
+const { validateEmployee } = useValidation()
 const filters = store.filters
 const employees = store.list
 const loading = ref(false)
@@ -17,7 +19,11 @@ const load = async () => {
 
 const resetForm = () => { store.resetForm() }
 
-const save = async () => { await store.save(); toast('저장 완료', 'success') }
+const save = async () => {
+  const { valid, message } = validateEmployee(store.form)
+  if (!valid) return toast(message, 'danger')
+  await store.save(); toast('저장 완료', 'success')
+}
 
 const onExcel = async (e) => {
   const file = e.target.files?.[0]
