@@ -3,8 +3,10 @@ import { onMounted } from 'vue'
 import EvalItemForm from '../components/EvalItemForm.vue'
 import { toast } from '../../../services/toast'
 import { useEvalItemsStore } from '../store/useEvalItemsStore'
+import { useValidation } from '../../../composables/useValidation'
 
 const store = useEvalItemsStore()
+const { validateEvalItem } = useValidation()
 const keyword = store.$state.keyword
 const categoryFilter = store.$state.categoryFilter
 const categories = store.$state.categories
@@ -18,7 +20,11 @@ const newCategoryName = store.$state.newCategoryName
 
 const load = async () => { await store.load() }
 
-const saveItem = async () => { await store.saveItem(); toast('저장 완료', 'success') }
+const saveItem = async () => {
+  const { valid, message } = validateEvalItem(store.form)
+  if (!valid) return toast(message, 'danger')
+  await store.saveItem(); toast('저장 완료', 'success')
+}
 
 const addCategory = async () => { await store.addCategory(); toast('카테고리 추가 완료', 'success') }
 
