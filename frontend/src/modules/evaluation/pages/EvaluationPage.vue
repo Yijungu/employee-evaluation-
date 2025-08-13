@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { searchEmployees } from '../../employees/services/employees.service'
 import { getEvalItems, saveEvaluations, saveMemo, saveRaise, getEvaluations, getRaise } from '../services/evaluation.service'
+import EvaluationRows from '../components/EvaluationRows.vue'
+import { toast } from '../../../services/toast'
 
 const employees = ref([])
 const items = ref([])
@@ -61,7 +63,7 @@ const saveRow = async (emp) => {
     const saved = res.data.data || []
     rowsByEmp.value[emp.id] = saved.map(s => ({ id: Date.now()+Math.random(), itemId: s.itemId, score: s.score }))
   } catch {}
-  alert('저장 완료')
+  toast('저장 완료', 'success')
 }
 
 const load = async () => {
@@ -114,15 +116,7 @@ onMounted(load)
           <td>{{ e.joinYear }}</td>
           <td>₩{{ Number(e.baseSalary).toLocaleString() }}</td>
           <td>
-            <div v-for="(r, idx) in rowsByEmp[e.id]" :key="r.id" class="d-flex gap-2 mb-2">
-              <select v-model="r.itemId" class="form-select">
-                <option :value="null">항목 선택</option>
-                <option v-for="it in items" :key="it.id" :value="it.id">{{ it.name }}</option>
-              </select>
-              <input v-model.number="r.score" type="number" class="form-control" placeholder="점수" style="max-width:120px"/>
-              <button class="btn btn-outline-danger" @click="removeRow(e.id, idx)">삭제</button>
-            </div>
-            <button class="btn btn-outline-primary btn-sm" @click="addRow(e.id)">+ 항목 추가</button>
+            <EvaluationRows :rows="rowsByEmp[e.id]" :items="items" @add="addRow(e.id)" @remove="(idx) => removeRow(e.id, idx)" />
           </td>
           <td class="fw-bold">{{ totalScore(e.id) }}</td>
           <td>
