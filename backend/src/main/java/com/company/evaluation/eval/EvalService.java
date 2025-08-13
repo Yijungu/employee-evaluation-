@@ -41,7 +41,11 @@ public class EvalService {
 
     // Categories
     public List<EvalCategory> listCategories() { return categoryRepo.findAll(); }
-    public EvalCategory createCategory(EvalCategory c) { return categoryRepo.save(c); }
+    public EvalCategory createCategory(com.company.evaluation.eval.dto.CategoryCreateRequest req) {
+        EvalCategory c = new EvalCategory();
+        c.setName(req.getName());
+        return categoryRepo.save(c);
+    }
 
     // Items
     public List<EvalItemResponse> listItems() { return itemRepo.findAll().stream().map(itemMapper::toResponse).toList(); }
@@ -56,24 +60,24 @@ public class EvalService {
     }
 
     // Evaluations
-    public List<Evaluation> saveEvaluations(Long employeeId, List<Evaluation> evaluations) {
+    public List<EvaluationRowResponse> saveEvaluations(Long employeeId, List<com.company.evaluation.eval.dto.EvaluationUpsertRequest> evaluations) {
         Employee emp = employeeRepo.findById(employeeId).orElseThrow();
-        for (Evaluation ev : evaluations) {
-            ev.setEmployee(emp);
-            if (ev.getItem() != null && ev.getItem().getId() != null) {
-                EvalItem it = itemRepo.findById(ev.getItem().getId()).orElseThrow();
-                ev.setItem(it);
-            }
-            if (ev.getItem() == null || ev.getItem().getId() == null) continue;
-            Evaluation existing = evaluationRepo.findByEmployeeIdAndItemId(employeeId, ev.getItem().getId());
+        for (com.company.evaluation.eval.dto.EvaluationUpsertRequest ev : evaluations) {
+            if (ev.getItemId() == null) continue;
+            EvalItem it = itemRepo.findById(ev.getItemId()).orElseThrow();
+            Evaluation existing = evaluationRepo.findByEmployeeIdAndItemId(employeeId, ev.getItemId());
             if (existing != null) {
                 existing.setScore(ev.getScore());
                 evaluationRepo.save(existing);
             } else {
-                evaluationRepo.save(ev);
+                Evaluation e = new Evaluation();
+                e.setEmployee(emp);
+                e.setItem(it);
+                e.setScore(ev.getScore());
+                evaluationRepo.save(e);
             }
         }
-        return evaluationRepo.findByEmployeeId(employeeId);
+        return getEvaluations(employeeId);
     }
 
     public List<EvaluationRowResponse> getEvaluations(Long employeeId) {
@@ -85,9 +89,13 @@ public class EvalService {
                 )).toList();
     }
 
-    public EmployeeMemo saveMemo(Long employeeId, EmployeeMemo memo) {
-        memo.setEmployee(employeeRepo.findById(employeeId).orElseThrow());
-        return memoRepo.save(memo);
+    public EmployeeMemo saveMemo(Long employeeId, com.company.evaluation.eval.dto.MemoRequest memo) {
+        EmployeeMemo m = new EmployeeMemo();
+        m.setEmployee(employeeRepo.findById(employeeId).orElseThrow());
+        m.setProjectName(memo.getProjectName());
+        m.setPeriod(memo.getPeriod());
+        m.setDetail(memo.getDetail());
+        return memoRepo.save(m);
     }
 
     public SalaryRaiseResponse saveRaise(Long employeeId, SalaryRaiseRequest req) {
