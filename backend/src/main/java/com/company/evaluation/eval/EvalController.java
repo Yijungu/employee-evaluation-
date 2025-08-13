@@ -4,8 +4,7 @@ import com.company.evaluation.common.ApiResponse;
 import com.company.evaluation.eval.domain.EmployeeMemo;
 import com.company.evaluation.eval.domain.Evaluation;
 import com.company.evaluation.eval.domain.EvalCategory;
-import com.company.evaluation.eval.dto.EvalItemRequest;
-import com.company.evaluation.eval.dto.EvalItemResponse;
+import com.company.evaluation.eval.dto.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,7 @@ public class EvalController {
     public ApiResponse<List<EvalCategory>> categories() { return ApiResponse.ok(service.listCategories()); }
 
     @PostMapping("/categories")
-    public ApiResponse<EvalCategory> createCategory(@RequestBody @Valid EvalCategory c) { return ApiResponse.ok(service.createCategory(c)); }
+    public ApiResponse<EvalCategory> createCategory(@RequestBody @Valid CategoryCreateRequest req) { return ApiResponse.ok(service.createCategory(req)); }
 
     // Items
     @GetMapping("/items")
@@ -41,8 +40,8 @@ public class EvalController {
 
     // Evaluations (EAV)
     @PostMapping("/employees/{id}/evaluations")
-    public ApiResponse<List<Evaluation>> saveEvaluations(@PathVariable("id") Long employeeId,
-                                                         @RequestBody List<Evaluation> evaluations) { return ApiResponse.ok(service.saveEvaluations(employeeId, evaluations)); }
+    public ApiResponse<List<EvaluationRowResponse>> saveEvaluations(@PathVariable("id") Long employeeId,
+                                                         @RequestBody @Valid List<EvaluationUpsertRequest> evaluations) { return ApiResponse.ok(service.saveEvaluations(employeeId, evaluations)); }
 
     // Fetch evaluations per employee (for showing saved rows)
     @GetMapping("/employees/{id}/evaluations")
@@ -50,7 +49,7 @@ public class EvalController {
 
     // Memo
     @PostMapping("/employees/{id}/memos")
-    public ApiResponse<EmployeeMemo> addMemo(@PathVariable("id") Long employeeId, @RequestBody @Valid EmployeeMemo memo) { return ApiResponse.ok(service.saveMemo(employeeId, memo)); }
+    public ApiResponse<EmployeeMemo> addMemo(@PathVariable("id") Long employeeId, @RequestBody @Valid MemoRequest memo) { return ApiResponse.ok(service.saveMemo(employeeId, memo)); }
 
     // Salary raise
     @PostMapping("/employees/{id}/raise")

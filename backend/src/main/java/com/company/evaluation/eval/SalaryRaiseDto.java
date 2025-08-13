@@ -13,7 +13,10 @@ public class SalaryRaiseDto {
     private Long raisedSalary;
 
     public static SalaryRaiseDto from(SalaryRaise r) {
-        return new SalaryRaiseDto(r.getRaisePercent(), r.getRaisedSalary());
+        SalaryRaiseDto dto = new SalaryRaiseDto();
+        dto.setRaisePercent(r.getRaisePercent());
+        dto.setRaisedSalary(r.getRaisedSalary());
+        return dto;
     }
 }
 

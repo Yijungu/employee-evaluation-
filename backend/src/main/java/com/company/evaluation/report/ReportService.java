@@ -23,7 +23,7 @@ public class ReportService {
 
     public ReportResponse buildReport() {
         List<Employee> employees = employeeRepository.findAll();
-        List<Long> ids = employees.stream().map(Employee::getId).toList();
+        List<Long> ids = employees.stream().map(e -> e.getId()).toList();
 
         Map<Long, Integer> scoreSum = new HashMap<>();
         for (Object[] row : evaluationRepository.findScoreSumByEmployeeIds(ids)) {
@@ -35,7 +35,7 @@ public class ReportService {
         Map<Long, Long> lastRaised = new HashMap<>();
         for (Long id : ids) {
             Long raised = salaryRaiseRepository.findTopByEmployeeIdOrderByIdDesc(id)
-                    .map(SalaryRaise::getRaisedSalary).orElse(null);
+                    .map(s -> s.getRaisedSalary()).orElse(null);
             lastRaised.put(id, raised);
         }
 
@@ -63,7 +63,14 @@ public class ReportService {
             avgRaise = Math.round((sumPct / counted) * 10.0) / 10.0;
         }
 
-        return new ReportResponse(working, retired, avgRaise, totalBase, totalRaised, rows);
+        ReportResponse resp = new ReportResponse();
+        resp.setWorkingCount(working);
+        resp.setRetiredCount(retired);
+        resp.setAvgRaisePercent(avgRaise);
+        resp.setTotalBasePayroll(totalBase);
+        resp.setTotalRaisedPayroll(totalRaised);
+        resp.setEmployees(rows);
+        return resp;
     }
 }
 

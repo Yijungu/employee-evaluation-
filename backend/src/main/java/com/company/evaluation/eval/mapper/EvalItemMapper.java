@@ -22,7 +22,6 @@ public interface EvalItemMapper {
     default EvalCategory toCategory(Long id) {
         if (id == null) return null;
         EvalCategory c = new EvalCategory();
-        c.setId(id);
         return c;
     }
 }
