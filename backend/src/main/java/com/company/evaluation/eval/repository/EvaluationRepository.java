@@ -1,5 +1,6 @@
-package com.company.evaluation.eval;
+package com.company.evaluation.eval.repository;
 
+import com.company.evaluation.eval.domain.Evaluation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

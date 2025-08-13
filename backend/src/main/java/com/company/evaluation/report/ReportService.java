@@ -2,9 +2,9 @@ package com.company.evaluation.report;
 
 import com.company.evaluation.employee.Employee;
 import com.company.evaluation.employee.EmployeeRepository;
-import com.company.evaluation.eval.EvaluationRepository;
-import com.company.evaluation.eval.SalaryRaise;
-import com.company.evaluation.eval.SalaryRaiseRepository;
+import com.company.evaluation.eval.repository.EvaluationRepository;
+import com.company.evaluation.eval.domain.SalaryRaise;
+import com.company.evaluation.eval.repository.SalaryRaiseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

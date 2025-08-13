@@ -3,6 +3,7 @@ package com.company.evaluation.eval;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.company.evaluation.eval.domain.Evaluation;
 
 @Data
 @NoArgsConstructor

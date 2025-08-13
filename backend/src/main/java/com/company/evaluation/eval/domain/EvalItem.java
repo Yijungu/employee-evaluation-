@@ -1,4 +1,4 @@
-package com.company.evaluation.eval;
+package com.company.evaluation.eval.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
