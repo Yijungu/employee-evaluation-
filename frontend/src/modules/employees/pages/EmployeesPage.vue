@@ -1,45 +1,30 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { searchEmployees, saveEmployee, uploadEmployeesExcel } from '../services/employees.service'
 import EmployeeFormModal from '../components/EmployeeFormModal.vue'
+import { useEmployeesStore } from '../store/useEmployeesStore'
+import { toast } from '../../../services/toast'
 
-const filters = ref({ name: '', status: '', region: '' })
-const employees = ref([])
+const store = useEmployeesStore()
+const filters = store.filters
+const employees = store.list
 const loading = ref(false)
-const form = ref({ id: null, employeeNumber: '', name: '', joinYear: new Date().getFullYear(), baseSalary: 0, position: '', workStatus: '근무', workRegion: '국내', email: '', phone: '', notes: '' })
+const form = ref(store.form)
 
 const load = async () => {
   loading.value = true
-  try {
-    const { data } = await searchEmployees(filters.value)
-    employees.value = data.data?.content ?? []
-  } finally {
-    loading.value = false
-  }
+  try { await store.load() } finally { loading.value = false }
 }
 
-const resetForm = () => {
-  form.value = { id: null, employeeNumber: '', name: '', joinYear: new Date().getFullYear(), baseSalary: 0, position: '', workStatus: '근무', workRegion: '국내', email: '', phone: '', notes: '' }
-}
+const resetForm = () => { store.resetForm() }
 
-const save = async () => {
-  await saveEmployee(form.value)
-  await load()
-  alert('저장 완료')
-}
+const save = async () => { await store.save(); toast('저장 완료', 'success') }
 
 const onExcel = async (e) => {
   const file = e.target.files?.[0]
   if (!file) return
-  try {
-    const { data } = await uploadEmployeesExcel(file)
-    await load()
-    alert(`업로드 완료: ${data.data}건 저장`)
-  } catch (err) {
-    alert('엑셀 업로드 실패. 파일 형식과 내용을 확인해 주세요.')
-  } finally {
-    e.target.value = ''
-  }
+  try { const { data } = await store.uploadExcel(file); toast(`업로드 완료: ${data}건 저장`, 'success') }
+  catch { toast('엑셀 업로드 실패. 파일 형식과 내용을 확인해 주세요.', 'danger') }
+  finally { e.target.value = '' }
 }
 
 
